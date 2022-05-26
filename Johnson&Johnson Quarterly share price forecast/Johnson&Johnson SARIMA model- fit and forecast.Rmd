@@ -1,0 +1,197 @@
+---
+title: "Johnson&Johnson SARIMA model- fit and forecast"
+author: "NIkita Pardeshi"
+output: html_document
+---
+
+### Load necessary libraries
+
+```{r setup, include=TRUE}
+#load necessary libraries
+options(warn=-1)
+library(astsa) #provides time series model functions (arima, sarima)
+library(TSstudio) #plotly library for plotting time series data
+library(xts) #library to convert data frame to time series object
+library(forecast)
+```
+
+### Load Quaterly earnings of J&J data and plot the time series data
+
+```{r include=TRUE}
+ts_plot(JohnsonJohnson,title='Quaterly earnings of J&J share',
+        Xtitle='Year',Ytitle='Share price')
+```
+
+**It can be clearly seen that there is both trend and seasonality in the data.**
+
+### In order to remove the trend, we use the difference operator on the share price. Specifically, a new series is constructed where the value at the current time step is calculated as the difference between the original observation and the observation at the previous time step.
+  
+### value(t) = observation(t) - observation(t-1)
+
+```{r include=TRUE}
+#1. Log-return transformation 
+ts_plot(diff(log(JohnsonJohnson)), title ='Log-return transformation i.e. differencing') #d=1
+acf(diff(log(JohnsonJohnson)),main="ACF") #there is seasonality after every 4 lags 
+pacf(diff(log(JohnsonJohnson)),main='pacf')
+
+```
+
+It can be observed that the trend has been removed upto a great extent. 
+
+### In order to remove the seasonality, we double differentiate the share price.
+
+```{r include=TRUE}
+
+#2. Seasonal differencing 
+ts_plot(diff(diff(log(JohnsonJohnson)),4))
+
+```
+
+
+### We perform the Ljung-Box test to check for correlations between lags
+  
+# Null Hypothesis (H0): There is no autocorrelation between the lags
+
+# Alternate Hypothesis (H1): There is significant autocorrelation between the lags
+
+```{r include=TRUE}
+
+#3. Ljung Box test
+Box.test(diff(diff(JohnsonJohnson)),lag=log(length(JohnsonJohnson)))
+par(mfrow=c(2,1))
+acf(diff(diff(log(JohnsonJohnson)),4))
+pacf(diff(diff(log(JohnsonJohnson)),4))
+```
+
+p-value is less than 0.05 and hence, autocorrelation still exists between the lags and cannot be eliminated/reduced further.
+
+### Getting the best model dynamically
+
+```{r include=TRUE}
+d=1 #since we have differenced the Time Series once
+D=1
+s=4 #duration
+
+for(p in 1:2)
+{for(q in 1:2)
+{for(P in 1:2)
+{for(Q in 1:2)
+{if(p+d+q+P+D+Q<=10)
+{model<-arima(x=log(JohnsonJohnson),order=c(p-1,d,q-1),seasonal=list(order=c(P-1,D,Q-1),period=s))
+test<-Box.test(model$residuals,lag=log(length(model$residuals)))
+sse=sum(model$residuals^2)
+cat(p-1,d,q-1,P-1,D,Q-1, "AIC:",model$aic,"SSE:",sse,'p-value:',test$p.value,'\n')
+
+}
+}
+}
+}
+}
+
+#hence we chose the model (0,1,1,1,1,0)
+
+```
+
+**The model with the lowest AIC is (0,1,1,1,1,0) and one of the highest p-value.**
+
+```{r include=TRUE}
+#5. plotting seasonal arima of the model
+sarima(log(JohnsonJohnson),0,1,1,1,1,0,4)
+#acf plot shows that there is no autocorrelation between previous lags since no spike is above the noise line 
+#p-value verified that there is no autocorrelation 
+#Q-Q plot for residuals is almost linear
+```
+```{r include=TRUE}
+#6. forecasting 
+model.fit<-arima(x=(JohnsonJohnson),order=c(0,1,1),seasonal=list(order=c(1,1,0),period=4))
+print(model.fit)
+```
+
+The AIC of the above model is somewhat less. Plotting the results of the forecast. 
+
+```{r include=TRUE}
+plot(forecast(model.fit))
+
+forecast(model.fit)
+
+```
+We can see that the model has captured the trend and seasonality in the data and predicted on similar lines. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
