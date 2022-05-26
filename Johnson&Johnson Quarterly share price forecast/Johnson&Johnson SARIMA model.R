@@ -3,6 +3,10 @@ library(TSstudio)
 ts_plot(JohnsonJohnson,title='Quaterly earnings of J&J share',
         Xtitle='Year',Ytitle='Share price')
 
+# Verifying trend and seasonality in the data {.tabset}
+ts_decompose(JohnsonJohnson)
+
+
 par(mfrow=c(3,1))
 #1. Log-return transformation 
 ts_plot(diff(log(JohnsonJohnson)), title ='Log-return transformation i.e. differencing') #d=1

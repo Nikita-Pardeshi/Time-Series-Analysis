@@ -1,10 +1,15 @@
 ---
 title: "Johnson&Johnson SARIMA model- fit and forecast"
 author: "NIkita Pardeshi"
-output: html_document
+output: 
+  bookdown::html_document2:
+    self_contained: yes
+    toc: yes
+    number_sections: yes
+    df_print: paged
 ---
 
-### Load necessary libraries
+# Load necessary libraries {.tabset}
 
 ```{r setup, include=TRUE}
 #load necessary libraries
@@ -22,9 +27,18 @@ ts_plot(JohnsonJohnson,title='Quaterly earnings of J&J share',
         Xtitle='Year',Ytitle='Share price')
 ```
 
+# Verifying trend and seasonality in the data {.tabset}
+
+```{r include=TRUE}
+ts_decompose(JohnsonJohnson)
+```
+
+
 **It can be clearly seen that there is both trend and seasonality in the data.**
 
-### In order to remove the trend, we use the difference operator on the share price. Specifically, a new series is constructed where the value at the current time step is calculated as the difference between the original observation and the observation at the previous time step.
+# Remove Trend and seasonality {.tabset}
+
+In order to remove the trend, we use the difference operator on the share price. Specifically, a new series is constructed where the value at the current time step is calculated as the difference between the original observation and the observation at the previous time step.
   
 ### value(t) = observation(t) - observation(t-1)
 
@@ -48,11 +62,11 @@ ts_plot(diff(diff(log(JohnsonJohnson)),4))
 ```
 
 
-### We perform the Ljung-Box test to check for correlations between lags
+# Ljung-Box test to check for correlations between lags {.tabset}
   
-# Null Hypothesis (H0): There is no autocorrelation between the lags
+### Null Hypothesis (H0): There is no autocorrelation between the lags
 
-# Alternate Hypothesis (H1): There is significant autocorrelation between the lags
+### Alternate Hypothesis (H1): There is significant autocorrelation between the lags
 
 ```{r include=TRUE}
 
@@ -65,7 +79,7 @@ pacf(diff(diff(log(JohnsonJohnson)),4))
 
 p-value is less than 0.05 and hence, autocorrelation still exists between the lags and cannot be eliminated/reduced further.
 
-### Getting the best model dynamically
+# Select best model {.tabset}
 
 ```{r include=TRUE}
 d=1 #since we have differenced the Time Series once
@@ -108,6 +122,7 @@ print(model.fit)
 ```
 
 The AIC of the above model is somewhat less. Plotting the results of the forecast. 
+# Forecasting {.tabset}
 
 ```{r include=TRUE}
 plot(forecast(model.fit))
@@ -115,6 +130,7 @@ plot(forecast(model.fit))
 forecast(model.fit)
 
 ```
+
 We can see that the model has captured the trend and seasonality in the data and predicted on similar lines. 
 
 
