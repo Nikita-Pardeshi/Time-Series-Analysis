@@ -102,11 +102,14 @@ Box.test(diff(birth.ts),lag=log(length(birth.ts)))
 
 # Building the ARIMA model: Deciding parameters for the model through ACF and PACF
 
+## Correlation Analysis 
+
+The next step is to identify the level of correlation between the series and it’s lags, using the acf function:
+
 ```{r include=TRUE}
 par(mfrow=c(2,1))
 acf(diff(number_of_births))
 pacf(diff(number_of_births))
-
 
 ```
 

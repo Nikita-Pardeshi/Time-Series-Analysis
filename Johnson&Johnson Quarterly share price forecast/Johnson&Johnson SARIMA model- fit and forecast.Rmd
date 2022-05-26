@@ -44,7 +44,7 @@ In order to remove the trend, we use the difference operator on the share price.
 
 ```{r include=TRUE}
 #1. Log-return transformation 
-ts_plot(diff(log(JohnsonJohnson)), title ='Log-return transformation i.e. differencing') #d=1
+ts_decompose(diff(log(JohnsonJohnson))) #d=1
 acf(diff(log(JohnsonJohnson)),main="ACF") #there is seasonality after every 4 lags 
 pacf(diff(log(JohnsonJohnson)),main='pacf')
 
@@ -58,8 +58,10 @@ It can be observed that the trend has been removed upto a great extent.
 
 #2. Seasonal differencing 
 ts_plot(diff(diff(log(JohnsonJohnson)),4))
+ts_decompose(diff(diff(log(JohnsonJohnson))))
 
 ```
+
 
 
 # Ljung-Box test to check for correlations between lags {.tabset}
@@ -78,6 +80,23 @@ pacf(diff(diff(log(JohnsonJohnson)),4))
 ```
 
 p-value is less than 0.05 and hence, autocorrelation still exists between the lags and cannot be eliminated/reduced further.
+
+A more appropriate method to check correlations between the lags is by using ts_lags()- produces a scatter plot for each lag
+
+Autocorrelation between lags on raw data
+
+```{r include=TRUE}
+ts_lags(JohnsonJohnson)
+
+```
+
+**Extremely high correlations are found between each of the lags (linear plots/ relationships)**
+
+After double differentiating and taking log-transform, the autocorrelation is removed to a certain extent.  
+
+```{r include=TRUE}
+ts_lags(diff(diff(log(JohnsonJohnson))))
+```
 
 # Select best model {.tabset}
 
@@ -125,8 +144,8 @@ The AIC of the above model is somewhat less. Plotting the results of the forecas
 # Forecasting {.tabset}
 
 ```{r include=TRUE}
-plot(forecast(model.fit))
 
+plot_forecast(forecast(model.fit))
 forecast(model.fit)
 
 ```
