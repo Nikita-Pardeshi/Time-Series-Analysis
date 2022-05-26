@@ -103,6 +103,4 @@ df
 # Fitting the SARIMA Model: Does this perform better than the ARIMA model? 
 sarima(birth.ts, 0,1,2,0,0,0)
 
-#Looking at the p-values of Moving Averages, there is no autocorrelation between the lags. The AIC of the SARIMA model is better than that of ARIMA model. 
-#Looking at the normal Q-Q plot of the Standard Residuals, if fits the time series data almost perfectly.
-  
+#Looking at the p-values of Moving Averages, there is no autocorrelation between the lags. The AIC of the SARIMA model is somewhat similar to that of ARIMA model. The Q-Q plot is almost linear. 

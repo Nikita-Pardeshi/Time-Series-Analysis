@@ -2,12 +2,17 @@
 title: "ARIMA Fit- Daily Births CA"
 author: "NIkita Pardeshi"
 date: "1/10/2021"
-output: html_document
+output: 
+  bookdown::html_document2:
+    self_contained: yes
+    toc: yes
+    number_sections: yes
+    df_print: paged
 ---
 
-## This code is a demonstration of applying ARIMA and SARIMA to a time series data
+This code is a demonstration of applying ARIMA and SARIMA to a time series data
 
-### Loading necessary libraries
+# Loading necessary libraries
 
 ```{r setup, include=TRUE}
 options(warn=-1)
@@ -48,7 +53,7 @@ head(birth.ts)
 
 ```
 
-## Plotting the time series data
+# Plotting the time series data
 
 ```{r include=TRUE}
 ts_plot(birth.ts, title = "Daily total female births in California in 1959",
@@ -59,7 +64,7 @@ ts_plot(birth.ts, title = "Daily total female births in California in 1959",
 
 **There is definitely some trend in the time series**
 
-## We perform the Ljung-Box test to check for correlations between lags
+# Ljung-Box test to check for correlations between lags
 
 * Null Hypothesis (H0): There is no autocorrelation between the lags
 
@@ -73,7 +78,9 @@ Box.test(x=birth.ts,lag=log(length(birth.ts)))
 
 **Since the p-value is less than 0.05, we reject the Null Hypothesis and conclude that there is significant autocorrelation between the lags in the time series data**
 
-### In order to remove the trend, we use the difference operator on the number of births. Specifically, a new series is constructed where the value at the current time step is calculated as the difference between the original observation and the observation at the previous time step.
+# Remove trend
+
+In order to remove the trend, we use the difference operator on the number of births. Specifically, a new series is constructed where the value at the current time step is calculated as the difference between the original observation and the observation at the previous time step.
 
 **value(t) = observation(t) - observation(t-1)**
 
@@ -93,7 +100,7 @@ Box.test(diff(birth.ts),lag=log(length(birth.ts)))
 
 ```
 
-### Building the ARIMA model: Deciding parameters for the model through ACF and PACF
+# Building the ARIMA model: Deciding parameters for the model through ACF and PACF
 
 ```{r include=TRUE}
 par(mfrow=c(2,1))
@@ -136,7 +143,9 @@ df
 ```
 
 
-### We select the model with lowest AIC i.e. ARIMA(0,1,2)
+# Select best model
+
+We select the model with lowest AIC i.e. ARIMA(0,1,2)
 
 
 # Fitting the SARIMA Model: Does this perform better than the ARIMA model? 
@@ -146,9 +155,7 @@ sarima(birth.ts, 0,1,2,0,0,0)
 
 ```
 
-Looking at the p-values of Moving Averages, there is no autocorrelation between the lags. The AIC of the SARIMA model is better than that of ARIMA model. 
-
-**Looking at the normal Q-Q plot of the Standard Residuals, if fits the time series data almost perfectly.**
+Looking at the p-values of Moving Averages, there is no autocorrelation between the lags. The AIC of the SARIMA model is somewhat similar to that of ARIMA model. The Q-Q plot is almost linear. 
 
 
 
